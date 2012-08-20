@@ -1,4 +1,4 @@
-clojurelib
+clojure-common-utils
 ==========
 
 Common generic utilities for Clojure
@@ -45,3 +45,5 @@ help but want it everywhere.
     +
     +    
     ```
+    
+    and returns `11`
