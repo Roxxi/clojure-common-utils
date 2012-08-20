@@ -7,10 +7,9 @@ Get it
 ------
 
 Leiningen:
-
-    ```clojure
-    [roxxi/clojure-common-utils "0.0.1"]
-    ```
+```clojure
+[roxxi/clojure-common-utils "0.0.1"]
+```
 
 In your code:
 ```clojure
