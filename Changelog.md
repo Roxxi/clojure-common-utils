@@ -1,3 +1,11 @@
+# 0.0.3 
+
+Added `cross`, `every`
+
+`cross` recursively produces the cross product of any number of sequences of different lengths.
+
+`(every pred? coll)` returns true iff `pred?` is true for each element in `coll`
+
 # 0.0.2 
 
 Added `extract-map`, `project-map`, `set-over` and `only-n-times`.
