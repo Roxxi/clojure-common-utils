@@ -34,17 +34,19 @@
 (defn extract-map [some-seq
                    & {:keys [xform
                              key-extractor
-                             value-extractor]
+                             value-extractor
+                             initial]
                       :or {xform identity
                            key-extractor identity,
-                           value-extractor identity}}]
+                           value-extractor identity
+                           initial {}}}]
   (let [xform-assoc!
         (fn xform-assoc! [some-map elem]
           (let [xformed (xform elem)]
             (assoc! some-map (key-extractor xformed) (value-extractor xformed))))]
     (persistent!
      (loop [elems some-seq
-            new-map (transient {})]
+            new-map (transient initial)]
        (if (empty? elems)
          new-map
          (recur (rest elems)

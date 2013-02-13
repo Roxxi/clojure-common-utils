@@ -1,3 +1,7 @@
+# 0.0.4 
+
+`extract-map` now takes an keyword arg `:initial` where a base map can be specified to be added to.
+
 # 0.0.3 
 
 Added `cross`, `every`
