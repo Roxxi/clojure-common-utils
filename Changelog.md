@@ -1,3 +1,7 @@
+# 0.0.5
+
+`multi-line-str` is a macro that allows you to insert multi-line-strings that are pre-compiled to a single string.
+
 # 0.0.4 
 
 `extract-map` now takes an keyword arg `:initial` where a base map can be specified to be added to.

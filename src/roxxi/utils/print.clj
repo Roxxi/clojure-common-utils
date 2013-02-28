@@ -23,3 +23,7 @@
            (println
             (str "Expression " '~e " evaluates to " e# "\n+\n+")))
      e#))
+
+
+(defmacro multi-line-str [& strs]
+  (clojure.string/join " " strs))
