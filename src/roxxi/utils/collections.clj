@@ -35,15 +35,30 @@
                    & {:keys [xform
                              key-extractor
                              value-extractor
+                             fold-values
+                             fold-kons
+                             fold-knil
                              initial]
                       :or {xform identity
-                           key-extractor identity,
+                           key-extractor identity
                            value-extractor identity
+                           fold-values false
+                           fold-kons cons
+                           fold-knil nil
                            initial {}}}]
   (let [xform-assoc!
-        (fn xform-assoc! [some-map elem]
-          (let [xformed (xform elem)]
-            (assoc! some-map (key-extractor xformed) (value-extractor xformed))))]
+        (if fold-values
+          (fn folding-xform-assoc! [some-map elem]
+            (let [xformed (xform elem)
+                  the-key (key-extractor xformed)
+                  the-value (value-extractor xformed)
+                  whats-there (get some-map the-key)]
+              (if whats-there
+                (assoc! some-map the-key (fold-kons the-value whats-there))
+                (assoc! some-map the-key (fold-kons the-value fold-knil)))))
+          (fn xform-assoc! [some-map elem]
+            (let [xformed (xform elem)]
+              (assoc! some-map (key-extractor xformed) (value-extractor xformed)))))]
     (persistent!
      (loop [elems some-seq
             new-map (transient initial)]

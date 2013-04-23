@@ -1,3 +1,7 @@
+# 0.0.6
+
+Enabled Extract map to fold values that occur for the same key.
+
 # 0.0.5
 
 `multi-line-str` is a macro that allows you to insert multi-line-strings that are pre-compiled to a single string.
