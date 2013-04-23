@@ -12,5 +12,13 @@
   (is (= (extract-map [1 2 2 3 1 2 3 4 2 1] :fold-values true)
          {1 (list 1 1 1), 2 (list 2 2 2 2), 3 (list 3 3), 4 (list 4)}))
   (is (= (extract-map [1 2 2 3 1 2 3 4 2 1])
-         {1 1, 2 2, 3 3, 4 4})))
+         {1 1, 2 2, 3 3, 4 4}))
+  (is (= (extract-map
+          (pair-off [1 2 3 4 5 6 7 8 1 3 1 5 1 7 3 2 3 4 2 8])
+          :key-extractor first
+          :value-extractor second
+          :fold-values true
+          :fold-knil []
+          :fold-kons #(conj %2 %1))
+         {1 [2 3 5 7], 3 [4 2 4], 5 [6], 7 [8], 2 [8]})))
          
