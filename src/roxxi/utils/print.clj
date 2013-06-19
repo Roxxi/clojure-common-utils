@@ -7,7 +7,7 @@
             (str "Expression " '~e " evaluates to nil\n+\n+")),
            (and (seq? e#))
            (println
-            (str "Expression " '~e " evaluates to " (vec e#) " of type " (.getClass #^Object e#) "\n+\n+")),
+            (str "Expression " '~e " evaluates to " (doall e#) " of type " (.getClass #^Object e#) "\n+\n+")),
            :else
            (println
             (str "Expression " '~e " evaluates to " e# " of type " (.getClass #^Object e#) "\n+\n+")))
@@ -27,3 +27,7 @@
 
 (defmacro multi-line-str [& strs]
   (clojure.string/join " " strs))
+
+
+        
+
