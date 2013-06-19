@@ -1,3 +1,10 @@
+# 0.0.7
+
+`map->collecton` helps convert a map into a collection of values,
+can specify a function to merge the key-value pairs into singular values
+
+`filter-map`  Like `filter` but takes a kv-pred that is assumed to operate on a keyval, and yields a map
+
 # 0.0.6
 
 Enabled Extract map to fold values that occur for the same key.
