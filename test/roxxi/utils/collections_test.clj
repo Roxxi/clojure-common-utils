@@ -39,8 +39,38 @@
                             [:a :b :c]))
     (is (= (map->collection test-map [:a :b :c]
                             :project-kv #(str % %2))
-                            [":a1" ":b2" ":c3"]))))
+           [":a1" ":b2" ":c3"]))))
 
-  
-  
-         
+(deftest mask-map-test
+  (let [test-map {:a 1 :b 2 :c 3
+                  :d {:a 9 :b 10}
+                  :e {:a {:a 5 :b 6}}}]
+    (testing "Subset of keys"
+      (is (= (mask-map test-map {:a true :b true :c true})
+             {:b 2, :c 3, :a 1})))
+    (testing "Masking missing values"
+      (is (= (mask-map test-map {:a true :b true :c true :z true :q 1})
+             {:b 2, :c 3, :a 1})))
+    (testing "Transformation function"
+      (is (= (mask-map test-map {:a (fn [x] (+ x x)) :b true })
+             {:b 2, :a 2})))
+    (testing "nil as a mask value"
+      (is (= (mask-map test-map {:a nil}) nil)))
+    (testing "false as mask value"
+      (is (= (mask-map test-map {:a false}) nil)))
+    (testing "nil as a mask value and another"
+      (is (= (mask-map test-map {:a nil :c 1}) {:c 3})))
+    (testing "false as mask value and another"
+      (is (= (mask-map test-map {:a false :c 1}) {:c 3})))
+    (testing "macro-fn #() transform"
+      (is (= (mask-map test-map {:a #(+ % %) :b 5 :d 7})
+             {:d {:a 9, :b 10}, :b 2, :a 2})))
+    (testing "selection of a nested value"
+      (is (= (mask-map test-map {:d {:a 7}})
+             {:d {:a 9}})))
+    (testing "selection of a double nested value"
+      (is (= (mask-map test-map {:e {:a {:a 7}}})
+             {:e {:a {:a 5}}})))
+    (testing "selection of a single nested map"
+      (is (= (mask-map test-map {:e {:a 7}})
+             {:e {:a {:a 5, :b 6}}})))))

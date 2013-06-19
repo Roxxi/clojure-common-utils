@@ -1,3 +1,11 @@
+# 0.0.8
+`mask-map`
+
+Given a mask-map whose structure is some subset of some-map's structure, extract the structure specified. For a path to be extracted the terminal value in the mask-map must be a non-false yielding value. 
+If a function is provided as a terminal value in the mask, the function will be applied to the value in the source location, before being carried over to the resulting map.
+
+If the mask yeilds no values, nil will be returned.
+
 # 0.0.7
 
 `map->collecton` helps convert a map into a collection of values,

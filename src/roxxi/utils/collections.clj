@@ -99,8 +99,29 @@ and yields a map"
   (extract-map (filter kv-pred some-map)
                :key-extractor key
                :value-extractor val))
-  
-                  
+
+(declare mask-map)
+
+(defn- mask-map-triage-kv [kv a-mask]
+  (let [[k v] [(key kv) (val kv)]]
+    (if-let [mask-v (get a-mask k)]
+      (cond (fn? mask-v) {k (mask-v v)}
+            (and (map? mask-v) (map? v))
+            {k (mask-map v mask-v)}
+            :else {k v}))))
+
+(defn mask-map
+  "Given a mask-map whose structure is some subset of some-map's
+structure, extract the structure specified. For a path to be extracted
+the terminal value in the mask-map must be a non-false yielding value.
+
+If a function is provided as a terminal value in the mask, the function
+will be applied to the value in the source location, before being
+carried over to the resulting map.
+
+If the mask yeilds no values, nil will be returned."
+  [some-map map-mask]  
+  (apply merge (remove nil? (map #(mask-map-triage-kv % map-mask) some-map))))
 
 ;; by default just returns the value
 (defn- default-map->collection-combiner [_ v]
