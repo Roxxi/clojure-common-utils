@@ -91,3 +91,27 @@
          new-map
          (recur (rest kvs)
                 (xform-assoc! new-map (first kvs))))))))
+
+(defn filter-map
+  "Like `filter` but kv-pred is assumed to operate on a keyval,
+and yields a map"
+  [kv-pred some-map]
+  (extract-map (filter kv-pred some-map)
+               :key-extractor key
+               :value-extractor val))
+  
+                  
+
+;; by default just returns the value
+(defn- default-map->collection-combiner [_ v]
+  v)
+
+(defn map->collection
+  "Takes a map, and a vector of keys and applies project-kv to the
+key and corresponding value. By default returns values."
+  [some-map key-order
+   & {:keys [project-kv]
+      :or {project-kv default-map->collection-combiner}}]
+  (map #(project-kv % (get some-map %)) key-order))
+
+   
