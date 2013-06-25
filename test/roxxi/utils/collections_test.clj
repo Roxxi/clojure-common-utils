@@ -3,6 +3,15 @@
         roxxi.utils.collections))
 
 
+(deftest seq->java-list-test []
+  (testing "Conversion of different clojure seqs into a java.util.ArrayList:"
+    (testing "Vector"
+      (is (= (into [] (seq->java-list [1 2 3])) [1 2 3])))
+    (testing "List"
+      (is (= (into [] (seq->java-list '(1 2 3))) [1 2 3])))
+    (testing "Lazy sequence"
+      (is (= (into [] (seq->java-list (range 1 4))) [1 2 3])))))
+
 (deftest extract-map-with-fold []
   (is (= (extract-map [1 2 2 3 1 2 3 4 2 1]
                       :fold-values true
@@ -74,3 +83,6 @@
     (testing "selection of a single nested map"
       (is (= (mask-map test-map {:e {:a 7}})
              {:e {:a {:a 5, :b 6}}})))))
+
+
+

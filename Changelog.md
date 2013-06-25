@@ -1,3 +1,8 @@
+# 0.0.9 
+`seq->java-list`
+
+Takes a seq and returns a java.util.List
+
 # 0.0.8
 `mask-map`
 

@@ -30,6 +30,9 @@
       (recur (conj pairs (take 2 a-seq))
              (drop 2 a-seq)))))
 
+(defn seq->java-list ^java.util.List [coll]
+  (java.util.ArrayList. coll))
+
 ;; # Sets
 
 (defn set-over [& xs]
