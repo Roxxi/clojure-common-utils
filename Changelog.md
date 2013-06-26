@@ -1,3 +1,9 @@
+# 0.0.10
+
+Added test for `pair-off` which is now just a wrapper around
+`(partition-all 2 seq)` (I didn't know that existed!)
+
+
 # 0.0.9 
 `seq->java-list`
 

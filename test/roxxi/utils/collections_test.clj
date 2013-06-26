@@ -3,6 +3,15 @@
         roxxi.utils.collections))
 
 
+(deftest pair-off-test []
+  (is (= (pair-off [1 2 3 4 5 6]) (list (list 1 2)
+                                        (list 3 4)
+                                        (list 5 6))))
+  (testing "Trying to pair off an odd number of items"
+    (is (= (pair-off [1 2 3 4 5 ]) (list (list 1 2)
+                                         (list 3 4)
+                                         (list 5))))))
+
 (deftest seq->java-list-test []
   (testing "Conversion of different clojure seqs into a java.util.ArrayList:"
     (testing "Vector"

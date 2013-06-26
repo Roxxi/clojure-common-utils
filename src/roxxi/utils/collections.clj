@@ -22,13 +22,16 @@
           (cons x ys))
         (map list s)))))
 
-(defn pair-off  [some-seq]
+(comment (defn pair-off  [some-seq]
   (loop [pairs []
          a-seq some-seq]
     (if (or (empty? a-seq) (< (count a-seq) 2))
       pairs
       (recur (conj pairs (take 2 a-seq))
-             (drop 2 a-seq)))))
+             (drop 2 a-seq))))))
+
+(defn pair-off [some-seq]
+  (partition-all 2 some-seq))
 
 (defn seq->java-list ^java.util.List [coll]
   (java.util.ArrayList. coll))
