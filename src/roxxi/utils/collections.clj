@@ -141,4 +141,61 @@ key and corresponding value. By default returns values."
       :or {project-kv default-map->collection-combiner}}]
   (map #(project-kv % (get some-map %)) key-order))
 
-   
+
+(defn dissoc-in
+  "Removes the entry in the map at the path that is given."
+  [map path]
+  (cond (empty? path) map
+        (= (count path) 1) (dissoc map (first path))
+        :else
+        (let [prop (first path)
+              value (get map current-key)]
+          (assoc map prop (dissoc-in value (rest path))))))
+
+(defn- have-something-to-move? [json-map path]
+  (get-in json-map old-path))
+
+(defn- relocate-value [json-map old-path new-path]
+  (if-let [value (have-something-to-move? json-map old-path)]
+    ;; remove the old value, and insert the new value
+    (assoc-in (dissoc-in json-map old-path) new-key value)
+    json-map))
+
+(defn- vectorify [thing]
+  (if (vector? thing)
+    thing    
+    (vector thing)))
+
+(defn- nil-path?
+  "Because we vectorify kind of blindly, if we had a nil,
+we would've made [nil]- this tests for that"
+  [path]
+  (= [nil] path))
+
+(defn- remap-field [json-map mapping]
+  (let [old-path (vectorify (key mapping))
+        new-path (vectorify (val mapping))]
+    (if (nil-path? new-path)
+      ;; just remove the value
+      (dissoc-in json-map old-path)
+      (relocate-value json-map old-path new-path))))
+
+
+(defn remap-fields
+"Takes a set of field mappings and relocates the
+fields specified by the key to the location
+specified by the value.
+
+If the key is a vector it reads from that path;
+If the key is a string it treats it as a top-level path;
+If the value is a vector it writes to that path;
+If the value is a string it treats it as a top-level path;
+If the value is nil, it removes the key-value pair."
+  
+  [json-map mappings]
+  (loop [jmap json-map
+         mapping (first mappings)]
+    (if (empty? mappings)
+      jmap
+      (recur (remap-field jmap mapping) (rest mappings)))))
+
