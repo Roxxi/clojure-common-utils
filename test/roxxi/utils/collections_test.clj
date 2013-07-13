@@ -94,4 +94,50 @@
              {:e {:a {:a 5, :b 6}}})))))
 
 
+(deftest dissoc-in-test
+  (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}, :h {:i {:j 7}}}]
+    (testing "Remove top level element (should work like a normal dissoc)"
+      (is (= (dissoc-in test-map [:q])
+             {:a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}, :h {:i {:j 7}}})))
+    (testing "Remove nested element, that has other same-level elements"
+      (is (= (dissoc-in test-map [:c :d])
+             {:q 10, :a 1, :b 2, :c {:e 5}, :f {:g 6}, :h {:i {:j 7}}}))
+      (testing "Remove nested element that has no other same-level elemenets.
+Expect empty map to not be there."
+        (is (= (dissoc-in test-map [:f :g])
+             {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :h {:i {:j 7}}})))
+      (testing "More nested elements that would all return empty maps.
+Expect to be dropped at the top level"
+        (is (= (dissoc-in test-map [:h :i :j])
+               {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}}))))))
+  
+(deftest reassoc-in-test
+  (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5}}]
+    (testing "Different old->new path transformations that can happen:"
+      (testing "Old path is on the top level:"
+        (testing "New path is nil, should delete entry"
+          (is (= (reassoc-in test-map :q nil)
+                 {:a 1, :b 2, :c {:d 4, :e 5}})))
+         (testing "New path is top level, should move value to top level"
+          (is (= (reassoc-in test-map :q :q2)
+                 {:q2 10, :a 1, :b 2, :c {:d 4, :e 5}})))
+          (testing "New path is a vector, should move value to nested key"
+          (is (= (reassoc-in test-map :q [:q2 :q3])
+                 {:a 1, :b 2, :c {:d 4, :e 5}, :q2 {:q3 10}}))))
+      (testing "Old path is nested:"
+        (testing "New path is nil, should delete entry"
+          (is (= (reassoc-in test-map [:c :d] nil)
+                 {:q 10, :a 1, :b 2, :c {:e 5}})))
+         (testing "New path is top level, should move value to top level"
+          (is (= (reassoc-in test-map [:c :d] :d2)
+                 {:q 10, :a 1, :b 2, :c {:e 5}, :d2 4})))
+          (testing "New path is a vector, should move value to nested key"
+          (is (= (reassoc-in test-map [:c :d] [:c2 :d2])
+                 {:a 1, :b 2, :c {:e 5}, :q 10, :c2 {:d2 4}})))))))
 
+(deftest reassoc-many-test
+  (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5, :f 6}}
+        test-transforms {:q nil, :a :a2, :b [:b2 :b3], [:c :d] nil, [:c :e] :e2, [:c :f] [:c2 :f2]}]
+    (testing "Tests all the types of reassocs possible at once"
+      (is (= (reassoc-many test-map test-transforms)
+             {:a2 1, :b2 {:b3 2}, :e2 5, :c2 {:f2 6}})))))
