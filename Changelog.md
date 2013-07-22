@@ -1,5 +1,7 @@
 # 0.0.11
 
+
+
 Added `dissoc-in`. The performs `dissoc` on a path (represented as
 a vecter). This allows to `dissoc` nested keys, and is a big part of
 `reassoc-in`.
@@ -10,8 +12,7 @@ Added `reassoc-in` and `reassoc-many`. In reality,
 which is why the documentation is so similar. Only difference
 is that `reassoc-in` takes one mapping (old path and new path), but `reassoc-many` takes a map of mappings.
 
-`reassoc-in` 
-Takes a map and relocates the value at the old path to
+`reassoc-in` Takes a map and relocates the value at the old path to
 the new path.
 
 If the old path is a vector it reads from that path;
