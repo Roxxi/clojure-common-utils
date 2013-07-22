@@ -1,4 +1,5 @@
-(ns roxxi.utils.collections)
+(ns roxxi.utils.collections
+  (:use roxxi.utils.print))
 
 
 ;; # Collections
@@ -141,4 +142,72 @@ key and corresponding value. By default returns values."
       :or {project-kv default-map->collection-combiner}}]
   (map #(project-kv % (get some-map %)) key-order))
 
-   
+
+(defn dissoc-in
+  "Removes the entry in the map at the path that is given."
+  [map path]
+  (cond (empty? path) map
+        (= (count path) 1) (dissoc map (first path))
+
+        :else
+        (let [prop (first path)
+              value (get map prop)
+              new-value  (dissoc-in value (rest path))]
+          (if (empty? new-value)
+            (dissoc map prop)
+          (assoc map prop new-value)))))
+
+(defn- have-something-to-move? [json-map path]
+  (get-in json-map path))
+
+(defn- relocate-value [json-map old-path new-path]
+  (if-let [value (have-something-to-move? json-map old-path)]
+    ;; remove the old value, and insert the new value
+    (assoc-in (dissoc-in json-map old-path) new-path value)
+    json-map))
+
+(defn- vectorify [thing]
+  (if (vector? thing)
+    thing    
+    (vector thing)))
+
+(defn- nil-path?
+  "Because we vectorify kind of blindly, if we had a nil,
+we would've made [nil]- this tests for that"
+  [path]
+  (= [nil] path))
+
+(defn reassoc-in
+  "Takes a map and relocates the value at the old path to
+the new path.
+
+If the old path is a vector it reads from that path;
+If the old path is a string it treats it as a top-level path;
+If the new path is a vector it writes to that path;
+If the new path is a string it treats it as a top-level path;
+If the new path is nil, it removes the key-value pair."
+
+  [map old-path new-path]
+  (let [old-path (vectorify old-path)
+        new-path (vectorify new-path)]
+    (if (nil-path? new-path)
+      ;; just remove the value
+      (dissoc-in map old-path)
+      (relocate-value map old-path new-path))))
+
+(defn reassoc-many
+  "Takes a set of field mappings and relocates the
+fields specified by the key to the location
+specified by the value.
+
+If the key is a vector it reads from that path;
+If the key is a string it treats it as a top-level path;
+If the value is a vector it writes to that path;
+If the value is a string it treats it as a top-level path;
+If the value is nil, it removes the key-value pair."
+  
+  [map mappings]
+  (let [mapping (first mappings)]
+    (if (empty? mappings)
+      map
+      (recur (reassoc-in map (key mapping) (val mapping)) (rest mappings)))))
