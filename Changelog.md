@@ -34,6 +34,10 @@ If the value is a vector it writes to that path;
 If the value is a string it treats it as a top-level path;
 If the value is nil, it removes the key-value pair.
 
+# 0.0.11
+
+This binary came out no different than 0.0.10, had to redeploy.
+
 # 0.0.10
 
 Added test for `pair-off` which is now just a wrapper around
