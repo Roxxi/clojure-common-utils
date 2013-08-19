@@ -1,3 +1,13 @@
+# 0.0.13
+
+Added `walk-update-scalars`.  This function allows you to apply
+a function `f` to every non-collection element in a map `m`.
+If `m` contains, sets, vectors, seqs, or inner maps, `f` is applied
+to their inner values, unless their inner values happen to be 
+sets, vectors, seqs, or inner maps- in which case, this is recursively
+applied until non-seqable values are reached.
+
+
 # 0.0.12
 
 

@@ -204,10 +204,37 @@ If the key is a vector it reads from that path;
 If the key is a string it treats it as a top-level path;
 If the value is a vector it writes to that path;
 If the value is a string it treats it as a top-level path;
-If the value is nil, it removes the key-value pair."
-  
+If the value is nil, it removes the key-value pair."  
   [map mappings]
   (let [mapping (first mappings)]
     (if (empty? mappings)
       map
       (recur (reassoc-in map (key mapping) (val mapping)) (rest mappings)))))
+
+
+(declare walk-update-scalars)
+
+(defn- walk-apply
+  "Applies f to a value if it is not any kind of collection,
+otherwise applies f to each element in the collection;
+in the case of maps, only the value is supplied as the operand
+to f"
+  [maybe-scalar-value f]
+  (cond (map? maybe-scalar-value)
+        (walk-update-scalars maybe-scalar-value f)
+        (vector? maybe-scalar-value)
+        (vec (map #(walk-apply % f) maybe-scalar-value))
+        (seq? maybe-scalar-value)
+        (map #(walk-apply % f) maybe-scalar-value)
+        (set? maybe-scalar-value)
+        (into #{} (map #(walk-apply % f) maybe-scalar-value))
+        :else
+        (f maybe-scalar-value)))
+  
+(defn walk-update-scalars
+  "If the map is a tree, this would apply f to each leaf node-
+if an element happens to be a seq or a vector, this would also apply
+it to each element- i.e. collections are not scalars."
+  [some-map f]
+  (project-map some-map :value-xform #(walk-apply % f)))
+               

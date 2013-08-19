@@ -141,3 +141,28 @@ Expect to be dropped at the top level"
     (testing "Tests all the types of reassocs possible at once"
       (is (= (reassoc-many test-map test-transforms)
              {:a2 1, :b2 {:b3 2}, :e2 5, :c2 {:f2 6}})))))
+
+
+(deftest walk-update-scalars-test
+  (let [test-map {:a 5,
+                  :b "words",
+                  :c [:hi :hello "how are you" {:d 6, :e ["something"]}],
+                  :f
+                  {:f1 "hello",
+                   :f2 {:f21 12, 
+                        :f22 [1 2 3 4 5], ;; vector
+                        :f23 #{:a :c :b}}, ;; set / inner map
+                   :f3 (range 10) ;; returns a sequence
+                   }}]
+    (testing "All leaf node values should be returned as strings,
+and each data structure (set, seq, vector, inner map, etc should be
+preserved")
+    (is (= (walk-update-scalars test-map str)
+           {:a "5",
+            :b "words",
+            :c [":hi" ":hello" "how are you" {:d "6", :e ["something"]}],
+            :f
+            {:f1 "hello",
+             :f2 {:f21 "12", :f22 ["1" "2" "3" "4" "5"], :f23 #{":a" ":b" ":c"}},
+             :f3 '("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")}}))))
+      
