@@ -20,20 +20,19 @@ put doc strings on vars!"
   ([name doc-str val]
      `(def ~(with-meta name {:private true :doc doc-str}) ~val)))
 
-(defmacro cond-let
-  "Takes a binding-form and a set of test/expr pairs. Evaluates each test
-  one at a time. If a test returns logical true, cond-let evaluates and
-  returns expr with binding-form bound to the value of test and doesn't
-  evaluate any of the other tests or exprs. To provide a default value
-  either provide a literal that evaluates to logical true and is
-  binding-compatible with binding-form, or use :else as the test and don't
-  refer to any parts of binding-form in the expr. (cond-let binding-form)
-  returns nil."
-  [bindings & clauses]
-  (let [binding (first bindings)]
-    (when-let [[test expr & more] clauses]
+(defmacro acond
+  "Takes a set of test/expr pairs. Evaluates each test (one at a time, in
+order). If a test evaluates to logical true, cond-let evaluates and returns
+expr with `it` bound to the value of test (in the grand tradition of anaphoric
+macros). If no test evaluates to logical true, cond-let evalutes to nil.
+To provide a default value, make the last test be a literal (such as
+:else) that evaluates to logical true.
+
+(acond) and (acond single-expr) evalute to nil."
+  [& clauses]
+  (when-let [[test expr & more] clauses]
       (if (= test :else)
         expr
-        `(if-let [~binding ~test]
+        `(if-let [~'it ~test]
            ~expr
-           (cond-let ~bindings ~@more))))))
+           (acond ~@more)))))

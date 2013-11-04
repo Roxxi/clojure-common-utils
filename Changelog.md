@@ -1,9 +1,19 @@
+# 0.0.14
+
+Added `def-` and `acond`.
+
+The `def-` macro is to `def` as `defn-` is to `defn`.
+The `acond` macro is the standard anaphoric-cond from old Lispy
+traditions (with `it` as the capturing symbol).
+
+
+
 # 0.0.13
 
 Added `walk-update-scalars`.  This function allows you to apply
 a function `f` to every non-collection element in a map `m`.
 If `m` contains, sets, vectors, seqs, or inner maps, `f` is applied
-to their inner values, unless their inner values happen to be 
+to their inner values, unless their inner values happen to be
 sets, vectors, seqs, or inner maps- in which case, this is recursively
 applied until non-seqable values are reached.
 
@@ -54,7 +64,7 @@ Added test for `pair-off` which is now just a wrapper around
 `(partition-all 2 seq)` (I didn't know that existed!)
 
 
-# 0.0.9 
+# 0.0.9
 `seq->java-list`
 
 Takes a seq and returns a java.util.List
@@ -62,7 +72,7 @@ Takes a seq and returns a java.util.List
 # 0.0.8
 `mask-map`
 
-Given a mask-map whose structure is some subset of some-map's structure, extract the structure specified. For a path to be extracted the terminal value in the mask-map must be a non-false yielding value. 
+Given a mask-map whose structure is some subset of some-map's structure, extract the structure specified. For a path to be extracted the terminal value in the mask-map must be a non-false yielding value.
 If a function is provided as a terminal value in the mask, the function will be applied to the value in the source location, before being carried over to the resulting map.
 
 If the mask yeilds no values, nil will be returned.
@@ -82,11 +92,11 @@ Enabled Extract map to fold values that occur for the same key.
 
 `multi-line-str` is a macro that allows you to insert multi-line-strings that are pre-compiled to a single string.
 
-# 0.0.4 
+# 0.0.4
 
 `extract-map` now takes an keyword arg `:initial` where a base map can be specified to be added to.
 
-# 0.0.3 
+# 0.0.3
 
 Added `cross`, `every`
 
@@ -94,7 +104,7 @@ Added `cross`, `every`
 
 `(every pred? coll)` returns true iff `pred?` is true for each element in `coll`
 
-# 0.0.2 
+# 0.0.2
 
 Added `extract-map`, `project-map`, `set-over` and `only-n-times`.
 
