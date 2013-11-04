@@ -5,7 +5,7 @@
 ;; # Collections
 
 (defn every [pred coll]
-  (loop [coll (seq coll)]    
+  (loop [coll (seq coll)]
     (if (empty? coll)
       true
       (if (pred (first coll))
@@ -81,8 +81,8 @@
          new-map
          (recur (rest elems)
                 (xform-assoc! new-map (first elems))))))))
-  
-                   
+
+
 (defn project-map [some-map
                    & {:keys [key-xform
                              value-xform]
@@ -127,7 +127,7 @@ will be applied to the value in the source location, before being
 carried over to the resulting map.
 
 If the mask yeilds no values, nil will be returned."
-  [some-map map-mask]  
+  [some-map map-mask]
   (apply merge (remove nil? (map #(mask-map-triage-kv % map-mask) some-map))))
 
 ;; by default just returns the value
@@ -168,7 +168,7 @@ key and corresponding value. By default returns values."
 
 (defn- vectorify [thing]
   (if (vector? thing)
-    thing    
+    thing
     (vector thing)))
 
 (defn- nil-path?
@@ -204,7 +204,7 @@ If the key is a vector it reads from that path;
 If the key is a string it treats it as a top-level path;
 If the value is a vector it writes to that path;
 If the value is a string it treats it as a top-level path;
-If the value is nil, it removes the key-value pair."  
+If the value is nil, it removes the key-value pair."
   [map mappings]
   (let [mapping (first mappings)]
     (if (empty? mappings)
@@ -230,11 +230,10 @@ to f"
         (into #{} (map #(walk-apply % f) maybe-scalar-value))
         :else
         (f maybe-scalar-value)))
-  
+
 (defn walk-update-scalars
   "If the map is a tree, this would apply f to each leaf node-
 if an element happens to be a seq or a vector, this would also apply
 it to each element- i.e. collections are not scalars."
   [some-map f]
   (project-map some-map :value-xform #(walk-apply % f)))
-               
