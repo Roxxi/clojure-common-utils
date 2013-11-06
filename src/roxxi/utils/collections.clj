@@ -237,3 +237,73 @@ if an element happens to be a seq or a vector, this would also apply
 it to each element- i.e. collections are not scalars."
   [some-map f]
   (project-map some-map :value-xform #(walk-apply % f)))
+
+
+(defn- scalar? [x]
+  (not (coll? x)))
+
+(defn- empty-coll? [c]
+  (and (coll? c)
+       (empty? c)))
+
+(defn prune-map-scalars
+  "Removes property paths for each value that prune? returns
+ true for.
+
+The default prune-sigil used to identify what values to remove
+is 'nil', you can supply a different prune sigil in the event
+you want to prevent the removal of nil values.
+
+Scalar values inside of sets, vectors, sequences will not be pruned.
+
+For example, 2 in the vector below won't be pruned, but the 2
+nested in the map will be pruned.
+
+`(prune-map-scalars {:a [1 2 3 {:a 1 :b 2}]} even?)` => `{:a [1 2 3 {:a 1}]}`
+
+If, however, you want your other collections (vectors, sets, seqs) to also
+have their elements pruned, simply specify :prune-non-map-scalars to true
+and then 
+
+`(prune-map-scalars {:a [1 2 3 {:a 1 :b 2}]} even? :prune-non-map-scalars true)`
+ => `{:a [1 3 {:a 1}]}` <-- note the lack of the 2 in the array.
+"
+  [some-map prune? & {:keys [prune-sigil
+                             prune-non-map-scalars]
+                      :or {prune-sigil nil
+                           prune-non-map-scalars false}}]
+  (let [pruned? #(or (= (second %) prune-sigil) (empty-coll? (second %)))
+        ;; if we have a scalar, there's no need to recurse
+        ;; otherwise this captures the passing of our
+        ;; keyword arguments (hence we're not using recur)
+        recurse (fn recurse [v]
+                  (prune-map-scalars v prune?
+                                     :prune-sigil prune-sigil
+                                     :prune-non-map-scalars
+                                     prune-non-map-scalars))
+        recurse-non-scalars #(if (scalar? %) % (recurse %))
+        ;; when working through a seq of items,
+        ;; we may not want to consider non scalars
+        ;; unless we should prune-non-map-scalars
+        ;; we also want to not leave empty collections
+        ;; hanging around, which is why we remove them
+        prune-elems (if prune-non-map-scalars
+                      (fn [coll]
+                        (remove empty-coll?
+                                (map recurse-non-scalars
+                                     (remove #(and (scalar? %) (prune? %)) coll))))
+                      (fn [coll]
+                        (remove empty-coll?
+                                (map recurse-non-scalars coll))))
+        by-type (fn by-type [v]
+                  (cond
+                   (map? v) (recurse v)
+                   (coll? v) (let [pruned-seq (prune-elems v)]
+                               (cond
+                                (vector? v) (vec pruned-seq)
+                                (seq?    v) pruned-seq
+                                (set?    v) (set pruned-seq)))
+                   :else (if (prune? v) prune-sigil v)))
+        recursive-prune (fn recursive-prune [[k v]] [k (by-type v)])
+        pruned-kvs (remove pruned? (map recursive-prune some-map))]
+    (extract-map pruned-kvs :key-extractor first :value-extractor second)))

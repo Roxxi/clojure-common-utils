@@ -1,3 +1,25 @@
+# 0.0.15
+
+Added `prune-map-scalars`
+
+`prune-map-scalars` Takes a map and a predicate to apply to the scalar
+values of a map (recurising down any nested collection of collections)
+and removes the entire property paths to any values that meet the
+condition specified by the predicate.
+
+There are two optional arguments that can be specified:
+
+1. `:prune-sigil` will allow you to provide an alternative value to
+   use to mark objects to prune (default is nil- so if you want to
+   persist nil's, you should specify something that will definitely
+   not occur in your map)
+2. `:prune-non-map-scalars` if set to true (or any non-false value)
+   this will also prune corresponding values that occur in linear
+   sequences (e.g. scalar-values in vectors, sets, etc.) Even if this
+   parameter is not specified, maps inside of linear sequences will
+   still have their leaves pruned, but the scalar elements of
+   sequences will not be evaluated to be pruned unless this is specified.
+
 # 0.0.14
 
 Added `def-` and `acond`.

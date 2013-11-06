@@ -110,7 +110,7 @@ Expect empty map to not be there."
 Expect to be dropped at the top level"
         (is (= (dissoc-in test-map [:h :i :j])
                {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}}))))))
-  
+
 (deftest reassoc-in-test
   (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5}}]
     (testing "Different old->new path transformations that can happen:"
@@ -149,7 +149,7 @@ Expect to be dropped at the top level"
                   :c [:hi :hello "how are you" {:d 6, :e ["something"]}],
                   :f
                   {:f1 "hello",
-                   :f2 {:f21 12, 
+                   :f2 {:f21 12,
                         :f22 [1 2 3 4 5], ;; vector
                         :f23 #{:a :c :b}}, ;; set / inner map
                    :f3 (range 10) ;; returns a sequence
@@ -165,4 +165,69 @@ preserved")
             {:f1 "hello",
              :f2 {:f21 "12", :f22 ["1" "2" "3" "4" "5"], :f23 #{":a" ":b" ":c"}},
              :f3 '("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")}}))))
-      
+
+(deftest prune-map-scalars-test
+  (testing "Testing prune-map-scalars"
+    (let [test-map
+          {;; root level numbers
+           :a 1
+           :b 2
+           ;; vector and map in a vector
+           :c [3 4 5 6 {:c1 1 :c2 2 :c3 {:c31 1 :c32 2 :c33 3 :c34 4}} 7 8 9]
+           ;; set and map in a set, and vector in a map in a set
+           :d #{1 2 3 4 5 {:c1 1 :c2 2
+                           :c3 {:c31 1 :c32 2 :c33 3 :c34 4 :c35 [1 2 3 4]}}}
+           ;; a seq
+           :e (range 1 10)
+           ;; a map in a map with a nested vector, set, and seq
+           :f {:f1 1
+               :f2 2,
+               :f3 {:f31 12, :f32 [1 2 3 4 5 {:f321 2}], :f33 #{1 2 3 4 5 6}},
+               :f4 '(0 1 2 3 4 5 6 7 8 9)}
+           ;; a place where nothing should change
+           :g [1 3]
+           ;; a vector that should be removed when prune-non-map-scalars
+           :h [2 4]}]
+      (testing "to ensure we correctly leave values that contain values
+that should be filtered, but aren't because they are key-value pairs"
+        (is (= (prune-map-scalars test-map even?)
+               {:a 1,
+                :c [3 4 5 6 {:c1 1, :c3 {:c31 1, :c33 3}} 7 8 9],
+                :d #{1 2 3 4 5 {:c1 1, :c3 {:c31 1, :c33 3, :c35 [1 2 3 4]}}},
+                :e '(1 2 3 4 5 6 7 8 9),
+                :f
+                {:f1 1,
+                 :f3 {:f33 #{1 2 3 4 5 6}, :f32 [1 2 3 4 5]},
+                 :f4 '(0 1 2 3 4 5 6 7 8 9)},
+                :g [1 3]
+                :h [2 4]})))
+      (testing "to ensure we can prune non-map values"
+        (is (= (prune-map-scalars test-map even? :prune-non-map-scalars true)
+               {:a 1,
+                :c [3 5 {:c1 1, :c3 {:c31 1, :c33 3}} 7 9],
+                :d #{1 3 5 {:c1 1, :c3 {:c31 1, :c33 3, :c35 [1 3]}}},
+                :e '(1 3 5 7 9),
+                :f {:f1 1, :f3 {:f33 #{1 3 5}, :f32 [1 3 5 ]}, :f4 '(1 3 5 7 9)},
+                :g [1 3]})))
+      (testing "to ensure we can specify a different prune-sigil to persist nulls"
+        (let [test-map
+              {:a nil
+               :b 2
+               :c [nil 4 nil 6 {:c1 1, :c3 {:c31 1, :c32 2 :c33 3 :c34 nil}} 7 8 9 nil],
+               :d #{1 nil 3 4 5
+                    {:c1 1 :c2 2
+                     :c3 {:c31 1 :c32 2 :c33 nil :c34 4 :c35 [1 2 3 4 nil]}}}}]
+          (testing "and that if we don't specify a prune-sigil, that our nils would
+be gone. (All of the nils shouldn't be gone here, just the ones that are leaves of nested
+maps- depite the fact we said prune non-map-scalars, since the values in the non-maps
+don't satisify the prune condition"
+            (is (= (prune-map-scalars test-map #(and (number? %) (even? %))
+                                      :prune-non-map-scalars true)
+                   {:c [nil nil {:c1 1, :c3 {:c31 1, :c33 3}} 7 9 nil],
+                    :d #{nil 1 3 5 {:c1 1, :c3 {:c31 1, :c35 [1 3 nil]}}}})))
+          (testing "by specifying a different prune-sigil"
+            (is (= (prune-map-scalars test-map #(and (number? %) (even? %))
+                                      :prune-sigil :prune_dis)
+                   {:a nil,
+                    :c [nil 4 nil 6 {:c1 1, :c3 {:c31 1, :c33 3, :c34 nil}} 7 8 9 nil],
+                    :d #{nil 1 3 4 5 {:c1 1, :c3 {:c31 1, :c33 nil, :c35 [1 2 3 4 nil]}}}}))))))))
