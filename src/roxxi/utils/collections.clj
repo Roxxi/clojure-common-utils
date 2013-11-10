@@ -263,7 +263,7 @@ nested in the map will be pruned.
 
 If, however, you want your other collections (vectors, sets, seqs) to also
 have their elements pruned, simply specify :prune-non-map-scalars to true
-and then 
+and then
 
 `(prune-map-scalars {:a [1 2 3 {:a 1 :b 2}]} even? :prune-non-map-scalars true)`
  => `{:a [1 3 {:a 1}]}` <-- note the lack of the 2 in the array.
@@ -307,3 +307,26 @@ and then
         recursive-prune (fn recursive-prune [[k v]] [k (by-type v)])
         pruned-kvs (remove pruned? (map recursive-prune some-map))]
     (extract-map pruned-kvs :key-extractor first :value-extractor second)))
+
+;; taken from https://github.com/richhickey/clojure-contrib/blob/2ede388a9267d175bfaa7781ee9d57532eb4f20f/src/main/clojure/clojure/contrib/map_utils.clj
+(defn deep-merge-with
+  "Like merge-with, but merges maps recursively, applying the given fn
+  only when there's a non-map at a particular level.
+
+  (deepmerge + {:a {:b {:c 1 :d {:x 1 :y 2}} :e 3} :f 4}
+               {:a {:b {:c 2 :d {:z 9} :z 3} :e 100}})
+  -> {:a {:b {:z 3, :c 3, :d {:z 9, :x 1, :y 2}}, :e 103}, :f 4}"
+  [f & maps]
+  (apply
+    (fn m [& maps]
+      (if (every? map? maps)
+        (apply merge-with m maps)
+        (apply f maps)))
+    maps))
+
+(defn deep-merge
+  "Like merge-with, but merges maps recursively, applying the given fn
+  only when there's a non-map at a particular level.
+"
+  [& maps]
+  (apply deep-merge-with (fn [x y] y) maps))

@@ -1,3 +1,7 @@
+# 0.0.16
+
+Added `deep-merge` and `deep-merge-with` from [clojure-contrib/map_utils](https://github.com/richhickey/clojure-contrib/blob/2ede388a9267d175bfaa7781ee9d57532eb4f20f/src/main/clojure/clojure/contrib/map_utils.clj)
+
 # 0.0.15
 
 Added `prune-map-scalars`
