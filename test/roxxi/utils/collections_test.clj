@@ -109,7 +109,9 @@ Expect empty map to not be there."
       (testing "More nested elements that would all return empty maps.
 Expect to be dropped at the top level"
         (is (= (dissoc-in test-map [:h :i :j])
-               {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}}))))))
+               {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}})))
+      (testing "Providing a path that goes deeper than the actual available map"
+        (is (= (dissoc-in test-map [:c :d :e]) test-map))))))
 
 (deftest reassoc-in-test
   (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5}}]

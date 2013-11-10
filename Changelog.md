@@ -1,3 +1,8 @@
+# 0.0.17
+
+Fixed bug in `dissoc-in` that caused a crash if the path specified was
+deeper than the map went
+
 # 0.0.16
 
 Added `deep-merge` and `deep-merge-with` from [clojure-contrib/map_utils](https://github.com/richhickey/clojure-contrib/blob/2ede388a9267d175bfaa7781ee9d57532eb4f20f/src/main/clojure/clojure/contrib/map_utils.clj)

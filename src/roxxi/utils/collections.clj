@@ -147,15 +147,15 @@ key and corresponding value. By default returns values."
   "Removes the entry in the map at the path that is given."
   [map path]
   (cond (empty? path) map
+        (not (map? map)) map
         (= (count path) 1) (dissoc map (first path))
-
         :else
         (let [prop (first path)
               value (get map prop)
               new-value  (dissoc-in value (rest path))]
-          (if (empty? new-value)
+          (if (and (map? new-value) (empty? new-value))
             (dissoc map prop)
-          (assoc map prop new-value)))))
+            (assoc map prop new-value)))))
 
 (defn- have-something-to-move? [json-map path]
   (get-in json-map path))
