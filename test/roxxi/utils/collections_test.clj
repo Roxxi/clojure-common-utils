@@ -95,23 +95,32 @@
 
 
 (deftest dissoc-in-test
-  (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}, :h {:i {:j 7}}}]
-    (testing "Remove top level element (should work like a normal dissoc)"
-      (is (= (dissoc-in test-map [:q])
-             {:a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}, :h {:i {:j 7}}})))
-    (testing "Remove nested element, that has other same-level elements"
-      (is (= (dissoc-in test-map [:c :d])
-             {:q 10, :a 1, :b 2, :c {:e 5}, :f {:g 6}, :h {:i {:j 7}}}))
-      (testing "Remove nested element that has no other same-level elemenets.
+  (testing "dissoc-in"
+    (let [test-map
+          {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}, :h {:i {:j 7}}}]
+      (testing "Remove top level element (should work like a normal dissoc)"
+        (is (= (dissoc-in test-map [:q])
+               {:a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}, :h {:i {:j 7}}})))
+      (testing "Remove nested element, that has other same-level elements"
+        (is (= (dissoc-in test-map [:c :d])
+               {:q 10, :a 1, :b 2, :c {:e 5}, :f {:g 6}, :h {:i {:j 7}}}))
+        (testing "Remove nested element that has no other same-level elemenets.
 Expect empty map to not be there."
-        (is (= (dissoc-in test-map [:f :g])
-             {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :h {:i {:j 7}}})))
-      (testing "More nested elements that would all return empty maps.
+          (is (= (dissoc-in test-map [:f :g])
+                 {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :h {:i {:j 7}}})))
+        (testing "More nested elements that would all return empty maps.
 Expect to be dropped at the top level"
-        (is (= (dissoc-in test-map [:h :i :j])
-               {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}})))
-      (testing "Providing a path that goes deeper than the actual available map"
-        (is (= (dissoc-in test-map [:c :d :e]) test-map))))))
+          (is (= (dissoc-in test-map [:h :i :j])
+                 {:q 10, :a 1, :b 2, :c {:d 4, :e 5}, :f {:g 6}})))
+        (testing "Providing a path that goes deeper than
+the actual available map"
+          (is (= (dissoc-in test-map [:c :d :e]) test-map)))
+        (testing "Providing a path that goes deeper than the root keys,
+and uses a root-key that isn't part of the map"
+          (is (= (dissoc-in {:a 5} [:b :c]) {:a 5})))
+        (testing "That an empty map does not yield nil for the
+key, but is removed"
+          (is (= (dissoc-in {:a {}} [:a]) {})))))))
 
 (deftest reassoc-in-test
   (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5}}]

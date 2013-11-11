@@ -8,7 +8,7 @@ Get it
 
 Leiningen:
 ```clojure
-[roxxi/clojure-common-utils "0.0.17"]
+[roxxi/clojure-common-utils "0.0.18"]
 ```
 
 In your code:

@@ -1,3 +1,12 @@
+# 0.0.18
+
+Fixed bug in `dissoc-in`
+
+Before:
+`(dissoc-in {:a 5} [:b :c])` =>  `{:b nil, :a 5}`
+After:
+`(dissoc-in {:a 5} [:b :c])` =>  `{:a 5}`
+
 # 0.0.17
 
 Fixed bug in `dissoc-in` that caused a crash if the path specified was

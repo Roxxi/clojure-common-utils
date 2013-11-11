@@ -153,9 +153,10 @@ key and corresponding value. By default returns values."
         (let [prop (first path)
               value (get map prop)
               new-value  (dissoc-in value (rest path))]
-          (if (and (map? new-value) (empty? new-value))
-            (dissoc map prop)
-            (assoc map prop new-value)))))
+          (cond
+           (and (map? new-value) (empty? new-value)) (dissoc map prop)
+           (nil? new-value) map
+           :else (assoc map prop new-value)))))
 
 (defn- have-something-to-move? [json-map path]
   (get-in json-map path))
