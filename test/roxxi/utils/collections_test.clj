@@ -21,6 +21,26 @@
     (testing "Lazy sequence"
       (is (= (into [] (seq->java-list (range 1 4))) [1 2 3])))))
 
+
+(deftest collify-test []
+  (testing "Making sure I can collectionify things!"
+    (testing "String"
+      (is (coll? (collify "hello"))))
+    (testing "Number"
+      (is (coll? (collify 6))))
+    (testing "Set"
+      (is (coll? (collify #{1 2 3})))
+      (is (= (collify #{1 2 3}) #{1 2 3})))
+    (testing "Vector"
+      (is (coll? (collify [1 2 3])))
+      (is (= (collify [1 2 3]) [1 2 3])))
+    (testing "Map"
+      (is (coll? (collify {1 2 3 4})))
+      (is (= (collify {1 2 3 4}) {1 2 3 4})))
+    (testing "List"
+      (is (coll? (collify '(1 2 3))))
+      (is (= (collify '(1 2 3)) '(1 2 3))))))
+
 (deftest extract-map-with-fold []
   (is (= (extract-map [1 2 2 3 1 2 3 4 2 1]
                       :fold-values true

@@ -1,3 +1,9 @@
+# 0.0.19
+
+Added `collify` because I'm tired of writing the same
+if this isn't a collection, make it a collection code
+over and over.
+
 # 0.0.18
 
 Fixed bug in `dissoc-in`

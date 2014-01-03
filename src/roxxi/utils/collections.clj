@@ -37,6 +37,9 @@
 (defn seq->java-list ^java.util.List [coll]
   (java.util.ArrayList. coll))
 
+(defn collify [foo]
+  (if (coll? foo) foo (list foo)))
+
 ;; # Sets
 
 (defn set-over [& xs]
