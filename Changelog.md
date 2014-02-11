@@ -1,3 +1,23 @@
+# 0.0.20
+
+Added `print-expr-rec` and `print-expr-hella-rec`
+
+`print-expr-rec` recursively calls `print-expr` on interesting
+subforms, e.g
+
+user> (macroexpand-1 '(print-expr-rec (+ (* x x) (* y y))))
+(print-expr (+ (print-expr (* x x))
+               (print-expr (* y y))))
+
+`print-expr-hella-rec` recursively calls `print-expr` on all
+subforms, even if they may not be that interesting, e.g
+
+user> (macroexpand-1 '(print-expr-hella-rec (+ (* x x) (* y y))))
+(print-expr ((print-expr +)
+             (print-expr ((print-expr *) (print-expr x) (print-expr x)))
+             (print-expr ((print-expr *) (print-expr y) (print-expr y)))))
+
+
 # 0.0.19
 
 Added `collify` because I'm tired of writing the same
