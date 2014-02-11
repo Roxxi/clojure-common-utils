@@ -1,3 +1,8 @@
+# 0.0.20
+
+Added `with-consistent-now`, which captures the current time and
+allows you to use it by calling `consistent-now`.
+
 # 0.0.19
 
 Added `collify` because I'm tired of writing the same
