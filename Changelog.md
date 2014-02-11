@@ -1,4 +1,4 @@
-# 0.0.20
+# 0.0.21
 
 Added `print-expr-rec` and `print-expr-hella-rec`
 
@@ -17,6 +17,10 @@ user> (macroexpand-1 '(print-expr-hella-rec (+ (* x x) (* y y))))
              (print-expr ((print-expr *) (print-expr x) (print-expr x)))
              (print-expr ((print-expr *) (print-expr y) (print-expr y)))))
 
+# 0.0.20
+
+Added `with-consistent-now`, which captures the current time and
+allows you to use it by calling `consistent-now`.
 
 # 0.0.19
 
