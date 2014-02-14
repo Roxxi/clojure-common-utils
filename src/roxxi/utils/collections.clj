@@ -1,5 +1,6 @@
 (ns roxxi.utils.collections
-  (:use roxxi.utils.print))
+  (:use roxxi.utils.print)
+  (:require [clojure.pprint :refer [pprint]]))
 
 
 ;; # Collections
@@ -161,19 +162,30 @@ key and corresponding value. By default returns values."
            (nil? new-value) map
            :else (assoc map prop new-value)))))
 
-(defn- have-something-to-move? [json-map path]
-  (get-in json-map path))
-
-(defn- relocate-value [json-map old-path new-path]
-  (if-let [value (have-something-to-move? json-map old-path)]
-    ;; remove the old value, and insert the new value
-    (assoc-in (dissoc-in json-map old-path) new-path value)
-    json-map))
-
 (defn- vectorify [thing]
   (if (vector? thing)
     thing
     (vector thing)))
+
+(defn- have-something-to-move? [json-map path]
+  (condp = (count path)
+    0
+    false
+    1
+    (contains? json-map (first path))
+    (and (contains? json-map (first path))
+         (recur (get json-map (first path))
+                (rest path)))))
+
+(defn- relocate-value [json-map old-path new-path]
+  (if (have-something-to-move? json-map old-path)
+    ;; remove the old value, and insert the new value
+    (let [value (get-in json-map old-path)]
+      value
+      (-> json-map
+          (dissoc-in old-path)
+          (assoc-in new-path value)))
+    json-map))
 
 (defn- nil-path?
   "Because we vectorify kind of blindly, if we had a nil,

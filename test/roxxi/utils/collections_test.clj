@@ -164,14 +164,28 @@ key, but is removed"
                  {:q 10, :a 1, :b 2, :c {:e 5}, :d2 4})))
           (testing "New path is a vector, should move value to nested key"
           (is (= (reassoc-in test-map [:c :d] [:c2 :d2])
-                 {:a 1, :b 2, :c {:e 5}, :q 10, :c2 {:d2 4}})))))))
+                 {:a 1, :b 2, :c {:e 5}, :q 10, :c2 {:d2 4}})))))
+    (testing "Works for falsy values:"
+      (is (= (reassoc-in {:q 10} :q :a)
+             {:a 10}))
+      (is (= (reassoc-in {:q false} :q :a)
+             {:a false}))
+      (is (= (reassoc-in {:q nil} :q :a)
+             {:a nil})))))
 
 (deftest reassoc-many-test
   (let [test-map {:q 10, :a 1, :b 2, :c {:d 4, :e 5, :f 6}}
         test-transforms {:q nil, :a :a2, :b [:b2 :b3], [:c :d] nil, [:c :e] :e2, [:c :f] [:c2 :f2]}]
     (testing "Tests all the types of reassocs possible at once"
       (is (= (reassoc-many test-map test-transforms)
-             {:a2 1, :b2 {:b3 2}, :e2 5, :c2 {:f2 6}})))))
+             {:a2 1, :b2 {:b3 2}, :e2 5, :c2 {:f2 6}})))
+    (testing "Works for falsy values:"
+      (is (= (reassoc-many {:q 10} {:q :a})
+             {:a 10}))
+      (is (= (reassoc-many {:q false} {:q :a})
+             {:a false}))
+      (is (= (reassoc-many {:q nil} {:q :a})
+             {:a nil})))))
 
 
 (deftest walk-update-scalars-test

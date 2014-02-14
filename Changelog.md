@@ -1,3 +1,14 @@
+# 0.0.22
+
+Fixed bug in `reassoc-in` and `reassoc-many`
+
+Before:
+`(reassoc-many {:q false} {:q :a})` => `{:q false}`
+`(reassoc-many {:q nil} {:q :a})` => `{:q nil}`
+After:
+`(reassoc-many {:q false} {:q :a})` => `{:a false}`
+`(reassoc-many {:q nil} {:q :a})` => `{:a nil}`
+
 # 0.0.21
 
 Added `print-expr-rec` and `print-expr-hella-rec`
