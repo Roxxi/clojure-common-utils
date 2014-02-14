@@ -181,7 +181,6 @@ key and corresponding value. By default returns values."
   (if (have-something-to-move? json-map old-path)
     ;; remove the old value, and insert the new value
     (let [value (get-in json-map old-path)]
-      value
       (-> json-map
           (dissoc-in old-path)
           (assoc-in new-path value)))
