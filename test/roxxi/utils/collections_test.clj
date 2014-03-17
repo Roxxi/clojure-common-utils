@@ -276,3 +276,68 @@ don't satisify the prune condition"
                    {:a nil,
                     :c [nil 4 nil 6 {:c1 1, :c3 {:c31 1, :c33 3, :c34 nil}} 7 8 9 nil],
                     :d #{nil 1 3 4 5 {:c1 1, :c3 {:c31 1, :c33 nil, :c35 [1 2 3 4 nil]}}}}))))))))
+
+(deftest contains-path?-test
+  (testing "contains-path? works for"
+    (let [m {:a true,
+             :b 10,
+             :c "c",
+             :d false,
+             :e nil,
+             :f {:sub_f true},
+             :g {:sub_g 10},
+             :h {:sub_h "h"},
+             :i {:sub_i false},
+             :j {:sub_j nil},
+             :k {:sub_k {:sub_sub_k "zubat"}},
+             :l {:sub_l {:sub_sub_l false}}}]
+      (testing "top-level field, not a vector, truthy"
+        (is (contains-path? m :a))
+        (is (contains-path? m :b))
+        (is (contains-path? m :c)))
+      (testing "top-level field that's properly vectorfied, truthy"
+        (is (contains-path? m [:a]))
+        (is (contains-path? m [:b]))
+        (is (contains-path? m [:c])))
+      (testing "top-level field, not a vector, falsy"
+        (is (contains-path? m :d))
+        (is (contains-path? m :e)))
+      (testing "top-level field that's properly vectorfied, falsy"
+        (is (contains-path? m [:d]))
+        (is (contains-path? m [:e])))
+      (testing "nested field that's truthy"
+        (is (contains-path? m [:f :sub_f]))
+        (is (contains-path? m [:g :sub_g]))
+        (is (contains-path? m [:h :sub_h])))
+      (testing "nested field that's falsy"
+        (is (contains-path? m [:i :sub_i]))
+        (is (contains-path? m [:j :sub_j])))
+      (testing "deeply nested fields"
+        (is (contains-path? m [:k :sub_k :sub_sub_k]))
+        (is (contains-path? m [:l :sub_l :sub_sub_l])))
+      (testing "fields that aren't present"
+        (is (not (contains-path? m true)))
+        (is (not (contains-path? m :z)))
+        (is (not (contains-path? m "foobar")))
+        (is (not (contains-path? m [true])))
+        (is (not (contains-path? m [false])))
+        (is (not (contains-path? m [nil]))))))
+  (testing "contains-path? works for interesting keys"
+    (let [m {nil 14,
+             false 33,
+             true 42}]
+      (is (contains-path? m nil))
+      (is (contains-path? m false))
+      (is (contains-path? m true))
+      (is (contains-path? m [nil]))
+      (is (contains-path? m [false]))
+      (is (contains-path? m [true])))
+    (let [m {nil nil,
+             false false,
+             true true}]
+      (is (contains-path? m nil))
+      (is (contains-path? m false))
+      (is (contains-path? m true))
+      (is (contains-path? m [nil]))
+      (is (contains-path? m [false]))
+      (is (contains-path? m [true])))))

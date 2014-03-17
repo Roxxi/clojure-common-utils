@@ -1,3 +1,14 @@
+# 0.0.23
+
+Added `contains-path?`, which is like `contains?` but for paths,
+rather than just top-level fields.
+
+e.g.
+  `(contains-path? {:a true, :b {:sub_b false}} [:a])` => `true`
+  `(contains-path? {:a true, :b {:sub_b false}} [:b :sub_b])` => `true`
+  `(contains-path? {:a true, :b {:sub_b false}} [:c])` => `false`
+
+
 # 0.0.22
 
 Fixed bug in `reassoc-in` and `reassoc-many`

@@ -167,15 +167,31 @@ key and corresponding value. By default returns values."
     thing
     (vector thing)))
 
-(defn- have-something-to-move? [json-map path]
-  (condp = (count path)
-    0
-    false
-    1
-    (contains? json-map (first path))
-    (and (contains? json-map (first path))
-         (recur (get json-map (first path))
-                (rest path)))))
+(defn contains-path? [map path]
+  "Returns true if the path is present in the map.
+e.g.
+  (contains-path? {:a true, :b {:sub_b false}} [:a]) => true
+  (contains-path? {:a true, :b {:sub_b false}} [:b :sub_b]) => true
+  (contains-path? {:a true, :b {:sub_b false}} [:c]) => false
+
+Path should be a vector, unless it's a top-level field in which case you may
+give the key itself.
+e.g.
+  (contains-path? {...} :a) is acceptable in place of
+  (contains-path? {...} [:a])"
+  (loop [map map
+         path (vectorify path)]
+    (condp = (count path)
+      0
+      false
+      1
+      (contains? map (first path))
+      (and (contains? map (first path))
+           (recur (get map (first path))
+                  (rest path))))))
+
+(def ^:private have-something-to-move?
+  contains-path?)
 
 (defn- relocate-value [json-map old-path new-path]
   (if (have-something-to-move? json-map old-path)
@@ -225,7 +241,6 @@ If the value is nil, it removes the key-value pair."
     (if (empty? mappings)
       map
       (recur (reassoc-in map (key mapping) (val mapping)) (rest mappings)))))
-
 
 (declare walk-update-scalars)
 
