@@ -5,4 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo
             :comments "same as Clojure"}
-  :url https://github.com/okl/danger-clj-utils)
+  :url https://github.com/okl/danger-clj-utils
+  :aliases {"deploy" ["deploy" "clojars"]})
