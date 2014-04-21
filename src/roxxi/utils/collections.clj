@@ -146,6 +146,30 @@ key and corresponding value. By default returns values."
       :or {project-kv default-map->collection-combiner}}]
   (map #(project-kv % (get some-map %)) key-order))
 
+(defn- non-empty-map? [m]
+  (and (map? m)
+       (not (empty? m))))
+
+(defn- generate-paths-helper [m path-prefix include-internal-nodes?]
+  (let [leaf-nodes     (remove #(non-empty-map? (val %)) m)
+        internal-nodes (filter #(non-empty-map? (val %)) m)
+        leaf-paths     (map #(conj path-prefix %) (keys leaf-nodes))
+        internal-paths (map #(conj path-prefix %) (keys internal-nodes))
+        internal-sub-paths (mapcat (fn [[k v]]
+                                     (generate-paths-helper v (conj path-prefix k) include-internal-nodes?))
+                                   internal-nodes)]
+    (if include-internal-nodes?
+      (concat leaf-paths internal-paths internal-sub-paths)
+      (concat leaf-paths                internal-sub-paths))))
+
+(defn generate-paths
+  "Generates all paths (recursing into nested maps) for a given map.
+By default, only generates terminal paths (i.e. leaf nodes, i.e. keys with
+non-map values). If you want paths to internal nodes too (i.e. the keys with
+maps as values) then call with :include-internal-nodes true"
+  [m & {:keys [include-internal-nodes]
+        :or {include-internal-nodes false}}]
+  (generate-paths-helper m [] include-internal-nodes))
 
 (defn dissoc-in
   "Removes the entry in the map at the path that is given."
@@ -244,7 +268,7 @@ If the value is nil, it removes the key-value pair."
 
 (declare walk-update-scalars)
 
-(defn- walk-apply
+(defn walk-apply
   "Applies f to a value if it is not any kind of collection,
 otherwise applies f to each element in the collection;
 in the case of maps, only the value is supplied as the operand

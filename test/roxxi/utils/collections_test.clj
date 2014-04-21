@@ -113,6 +113,27 @@
       (is (= (mask-map test-map {:e {:a 7}})
              {:e {:a {:a 5, :b 6}}})))))
 
+(deftest generate-paths-test
+  (testing "generate-paths"
+    (let [m {"a" 1,
+             "b" {"sub_b" 22},
+             "c" {"sub_c" 33, "other_sub_c" {"sub_sub_c" 333}},
+             "d" {}}]
+      (is (= (into #{} (generate-paths m))
+             (set (list ["a"]
+                        ["b" "sub_b"]
+                        ["c" "sub_c"]
+                        ["c" "other_sub_c" "sub_sub_c"]
+                        ["d"]))))
+      (is (= (into #{} (generate-paths m :include-internal-nodes true))
+             (set (list ["a"]
+                        ["b"]
+                        ["b" "sub_b"]
+                        ["c"]
+                        ["c" "sub_c"]
+                        ["c" "other_sub_c"]
+                        ["c" "other_sub_c" "sub_sub_c"]
+                        ["d"])))))))
 
 (deftest dissoc-in-test
   (testing "dissoc-in"
@@ -187,6 +208,20 @@ key, but is removed"
       (is (= (reassoc-many {:q nil} {:q :a})
              {:a nil})))))
 
+
+(deftest walk-apply-test
+  (let [test-vec [1 2 3
+                  (list :foo :bar [false])
+                  {:a :a, :b :b}
+                  #{'margarets ['violet 'eyes]
+                    (list 'make 'john)
+                    {:stay 'up :nights 'pondering}}]]
+  (testing "walk-apply"
+    (is (= (walk-apply test-vec str)
+           ["1" "2" "3"
+            (list ":foo" ":bar" ["false"])
+            {:a ":a", :b ":b"}
+            #{{:nights "pondering", :stay "up"} ["violet" "eyes"] "margarets" (list "make" "john")}])))))
 
 (deftest walk-update-scalars-test
   (let [test-map {:a 5,

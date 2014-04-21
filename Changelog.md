@@ -1,3 +1,11 @@
+# 0.0.24
+
+1. Made `walk-apply` public.
+2. Added `generate-paths`.
+
+For usages, see collections_test.clj
+
+
 # 0.0.23
 
 Added `contains-path?`, which is like `contains?` but for paths,
